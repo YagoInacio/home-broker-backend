@@ -5,19 +5,30 @@ services:
     build: .
     ports:
       - 3000:3000
+      - 5555:5555
     volumes:
       - .:/home/node/app
+    networks:
+      - home-broker-network
 
   db:
     image: bitnami/mongodb:5.0.17
     volumes:
       - mongodb_data:/bitnami/mongodb
+    ports:
+      - 27017:27017
     environment:
       MONGODB_ROOT_PASSWORD: root
       MONGODB_REPLICA_SET_MODE: primary
       MONGODB_REPLICA_SET_KEY: 123456
       MONGODB_DATABASE: home_broker
+    networks:
+      - home-broker-network
 
 volumes:
   mongodb_data:
     driver: local
+
+networks:
+  home-broker-network:
+    external: true
