@@ -22,6 +22,7 @@ export class WalletAssetsService {
         walletId: input.walletId,
         assetId: input.assetId,
         shares: input.shares,
+        version: 1,
       },
     });
   }

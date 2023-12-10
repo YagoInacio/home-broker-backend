@@ -17,6 +17,7 @@ model Asset {
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
   WalletAssets WalletAsset[]
+  Orders       Order[]
 }
 
 model Wallet {
@@ -24,6 +25,7 @@ model Wallet {
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
   WalletAssets WalletAsset[]
+  Orders       Order[]
 }
 
 model WalletAsset {
@@ -33,8 +35,50 @@ model WalletAsset {
   Asset     Asset    @relation(fields: [assetId], references: [id])
   assetId   String   @map("asset_id")
   shares    Int      @db.Int
+  version   Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([walletId, assetId])
+}
+
+model Order {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  Wallet       Wallet        @relation(fields: [walletId], references: [id])
+  walletId     String        @map("wallet_id")
+  Asset        Asset         @relation(fields: [assetId], references: [id])
+  assetId      String        @map("asset_id")
+  shares       Int           @db.Int
+  price        Float
+  type         OrderType
+  status       OrderStatus
+  partial      Int           @db.Int
+  version      Int
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  Transactions Transaction[]
+}
+
+enum OrderType {
+  BUY
+  SELL
+}
+
+enum OrderStatus {
+  PENDING
+  OPEN
+  CLOSED
+  FAILED
+}
+
+model Transaction {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  Order               Order    @relation(fields: [orderId], references: [id])
+  orderId             String   @map("order_id") @db.ObjectId
+  investorId          String
+  brokerTransactionId String   @map("broker_transaction_id")
+  shares              Int      @db.Int
+  price               Float
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
 }
